@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/b254c2fb-9216-4956-a2ba-7f3678e1cfd7/resourceGroups/RG_prod/providers/Microsoft.Web/sites/tttclue",
+    "appService.deploySubpath": "."
+}

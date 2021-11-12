@@ -7,8 +7,11 @@
     <title>Document</title>
 </head>
 <body>
-    Hello world!
+    <input type="text" placeholder="Enter your name" onkeypress="sendName(event)" autocomplete="chrome-off" autocomplete="off"/>
     <div id="host"></div>
+    <div id="playerName"></div>
+    <div style="width:300px; position:fixed; right: 0; top: 0; background-color: lightgrey;" id="debug"></div>
+    <div style="width:300px; position:fixed; bottom: 0; left: 0; background-color: lightgrey;" id="socketId"></div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>
 </body>
