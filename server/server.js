@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
         game.addPlayerToRoom(socket.id, game.rooms[0]);
     }
     
-    io.emit("playerConnected", game.rooms[0].players);
+    io.emit("updatePlayers", game.rooms[0].players);
    
     // User disconnected
     socket.on('disconnect', () => {
@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
         
         game.rooms[0].removePlayer(socket.id);
 
-        io.emit("playerDisconnected", game.rooms[0].players);
+        io.emit("updatePlayers", game.rooms[0].players);
         // Choose another host if players available
         if ( socket.data.host && room.size > 0) {
             
@@ -70,13 +70,42 @@ io.on('connection', (socket) => {
             values: ["Host: " + hostSocket.id, "Players: " + io.of("/").in("room").adapter.sids.size]
         })
     });
-    
 
-    socket.on("changeName", (data) => {
-        game.rooms[0].players.find(a=>a.socketId === socket.id).name = data;
-        console.log(data);
-        io.emit("playerConnected", game.rooms[0].players);
+    socket.on("changeName", (name)=>{
+        const player = game.rooms[0].players.find(a=>a.socketId === socket.id);
+        player.name = name;
+        io.emit("updatePlayers", game.rooms[0].players);
+        console.log(name);
     });
+
+    socket.on("startGame", (data)=>{
+        const player = game.rooms[0].players.find(a=>a.socketId === socket.id);
+        player.name = data.name;
+        player.image = data.image;
+        player.ready = data.ready;
+        player.truth1 = data.truth1;
+        player.truth2 = data.truth2;
+        player.lie = data.lie;
+        io.emit("updatePlayers", game.rooms[0].players);
+        console.log("game starting");
+    });
+
+    socket.on("setReady", (data)=>{
+        const player = game.rooms[0].players.find(a=>a.socketId === socket.id);
+        player.name = data.name;
+        player.image = data.image;
+        player.ready = data.ready;
+        player.truth1 = data.truth1;
+        player.truth2 = data.truth2;
+        player.lie = data.lie;
+        io.emit("updatePlayers", game.rooms[0].players);
+    });
+    socket.on("setNotReady", ()=>{
+        const player = game.rooms[0].players.find(a=>a.socketId === socket.id);
+        player.ready = false;
+        io.emit("updatePlayers", game.rooms[0].players);
+    });
+
     Debug.add({
         id: "ID: room",
         name: "Room",

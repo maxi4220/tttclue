@@ -35,7 +35,6 @@ class Room {
         this.players.push(player);
     }
     removePlayer( socketId ) {
-
         this.players.splice(this.players.indexOf(this.players.find(a=>a.socketId === socketId)), 1);
     }
 }
@@ -45,11 +44,14 @@ class Player {
     socketId = "";
     name = "";
     image = "";
+    ready = false;
+    truth1 = "";
+    truth2 = "";
+    lie = "";
 
     constructor ( socketId, Debug ) {
         this.Debug = Debug;
         this.socketId = socketId;
     }
 }
-
 module.exports = Game;

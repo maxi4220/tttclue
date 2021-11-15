@@ -4,13 +4,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>TTT Two truths & One Lie</title>
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <input type="text" placeholder="Enter your name" onkeyup="sendName(event)" autocomplete="chrome-off" autocomplete="off" />
-    <div id="host"></div>
+    <input type="text" placeholder="Enter your name" id="playerName" onkeyup="sendName(event)" autocomplete="chrome-off" autocomplete="off" />
+    <br/>
+    <input type="text" placeholder="Truth 1" id="truth1" autocomplete="chrome-off" autocomplete="off" /><br/>
+    <input type="text" placeholder="Truth 2" id="truth2" autocomplete="chrome-off" autocomplete="off" /><br/>
+    <input type="text" placeholder="Lie" id="lie" autocomplete="chrome-off" autocomplete="off" /><br/>
+
+    <div id="hostGuest"> 
+        <button onclick="setReady()" id="btnReady">Ready</button> 
+        <button onclick="setNotReady()" style="display: none"; id="btnNotReady">NOT Ready</button>
+    </div>
+
+    <div id="gameStarting" style="display: none">Starting game in 5</div>
+
     <div id="playerName"></div>
-    <ul style="width:300px; position:fixed; left: 0; top: 50%; background-color: #be88c1;" id="players"></ul>
+    <ul style="width:300px; position:fixed; left: 0; top: 50%; background-color: lightgrey;" id="players"></ul>
     <div style="width:300px; position:fixed; right: 0; top: 0; background-color: lightgrey;" id="debug"></div>
     <div style="width:300px; position:fixed; bottom: 0; left: 0; background-color: lightgrey;" id="socketId"></div>
     <script src="/socket.io/socket.io.js"></script>
