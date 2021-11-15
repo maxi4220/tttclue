@@ -1,50 +1,54 @@
 const { v4: uuidv4 } = require('uuid');
 
 class Game {
+    Debug = null;
     rooms = [];
-    allPlayers = [];
     
-    constructor(){
-        console.log("New Game");
+    constructor(Debug){
+        this.Debug = Debug;
     }
 
-    createRoom( socket ) {
-        console.log("Create Room");
+    createRoom( socketId ) {
+        let room = new Room( socketId, this.Debug );
         if ( this.rooms.length === 0 ) {
-            let player = new Player( socket );
-            this.rooms.push( new Room( player ) );
+            let player = new Player( socketId, this.Debug );
+            room.addPlayer( player );
         }
+        this.rooms.push( room );
     }
-    addPlayerToRoom ( socket, room ) {
-        console.log("new player " + socket.id);
-        let player = new Player( socket );
+    addPlayerToRoom ( socketId, room ) {
+        let player = new Player( socketId, this.Debug );
         room.addPlayer( player );
     }
 }
 
 class Room {
-    host = {};
+    Debug = null;
+    hostId = {};
     players = [];
 
-    constructor( player ) {
-        console.log("New Room. Host: " + player.socket.id);
-        this.host = player.socket.id;
-        this.players.push(player);
+    constructor( playerId, Debug) {
+        this.Debug = Debug;
+        this.hostId = playerId;
     }
-
     addPlayer( player ) {
         this.players.push(player);
+    }
+    removePlayer( socketId ) {
+
+        this.players.splice(this.players.indexOf(this.players.find(a=>a.socketId === socketId)), 1);
     }
 }
 
 class Player {
-    socket = {};
+    Debug = null;
+    socketId = "";
     name = "";
-    image = ""; //base64
+    image = "";
 
-    constructor ( socket ) {
-        console.log("New Player");
-        this.socket = socket;
+    constructor ( socketId, Debug ) {
+        this.Debug = Debug;
+        this.socketId = socketId;
     }
 }
 

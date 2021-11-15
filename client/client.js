@@ -34,7 +34,26 @@ socket.on("debug", function(data) {
     document.getElementById("socketId").innerHTML = socket.id;
 });
 
-function sendName(event) {
-    document.getElementById("playerName").innerHTML = event.target.value;
+socket.on("playerConnected", function(players){
+    updatePlayers(players);
+});
+socket.on("playerDisconnected", function(players){
+    updatePlayers(players);
+});
 
+function updatePlayers(players) {
+    let ulPlayers = document.getElementById("players");
+    ulPlayers.innerHTML = "";
+    for(let i = 0; i < players.length; i++){
+        let li = document.createElement("li");
+        li.appendChild(document.createTextNode(players[i].name || players[i].socketId));
+        ulPlayers.appendChild(li);
+    }
+}
+
+function sendName(event) {
+    var name = document.getElementById("playerName");
+    name.innerHTML = event.target.value;
+    if(event.which == 13)
+        socket.emit("changeName", event.target.value);
 }
