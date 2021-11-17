@@ -72,14 +72,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on("changeName", (name)=>{
-        const player = game.rooms[0].players.find(a=>a.socketId === socket.id);
+        const player = game.getPlayerInRoom(game.rooms[0], socket.id);
         player.name = name;
         io.emit("updatePlayers", game.rooms[0].players);
         console.log(name);
     });
 
     socket.on("startGame", (data)=>{
-        const player = game.rooms[0].players.find(a=>a.socketId === socket.id);
+        const player = game.getPlayerInRoom(game.rooms[0], socket.id);
         player.name = data.name;
         player.image = data.image;
         player.ready = data.ready;
@@ -88,10 +88,11 @@ io.on('connection', (socket) => {
         player.lie = data.lie;
         io.emit("updatePlayers", game.rooms[0].players);
         console.log("game starting");
+        game.startGame(io, game.rooms[0]);
     });
 
     socket.on("setReady", (data)=>{
-        const player = game.rooms[0].players.find(a=>a.socketId === socket.id);
+        const player = game.getPlayerInRoom(game.rooms[0], socket.id);
         player.name = data.name;
         player.image = data.image;
         player.ready = data.ready;
@@ -101,7 +102,7 @@ io.on('connection', (socket) => {
         io.emit("updatePlayers", game.rooms[0].players);
     });
     socket.on("setNotReady", ()=>{
-        const player = game.rooms[0].players.find(a=>a.socketId === socket.id);
+        const player = game.getPlayerInRoom(game.rooms[0], socket.id);
         player.ready = false;
         io.emit("updatePlayers", game.rooms[0].players);
     });

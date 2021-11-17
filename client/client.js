@@ -30,6 +30,16 @@ startGame.onclick = function(){
     }
 };
 
+
+const playerName = document.getElementById("playerName");
+const truth1 = document.getElementById("truth1");
+const truth2 = document.getElementById("truth2");
+const lie = document.getElementById("lie");
+playerName.value = Math.random() * 500;
+truth1.value = Math.random() * 500;
+truth2.value = Math.random() * 500;
+lie.value = Math.random() * 500;
+
 socket.on("host", function(socketId) {
     const hostGuest = document.getElementById("hostGuest");
     hostGuest.innerHTML = "";
@@ -69,6 +79,10 @@ socket.on("debug", function(data) {
 socket.on("updatePlayers", function(players) {
     allPlayers = players;
     updatePlayers(players);
+});
+
+socket.on("getCurrentPlayer", function(currentPlayer){
+    console.log(currentPlayer);
 });
 
 function updatePlayers(players) {
