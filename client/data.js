@@ -1,0 +1,297 @@
+let dummyPlayers =
+[
+    {
+      "name": "Carmina",
+      "age": 37,
+      "blood": "B+",
+      "height": "165 cm / 5 ft 5 in"
+    },
+    {
+      "name": "Cándida",
+      "age": 58,
+      "blood": "O+",
+      "height": "159 cm / 5 ft 3 in"
+    },
+    {
+      "name": "Sandalio",
+      "age": 26,
+      "blood": "B+",
+      "height": "172 cm / 5 ft 8 in"
+    },
+    {
+      "name": "Lucio",
+      "age": 46,
+      "blood": "O+",
+      "height": "178 cm / 5 ft 10 in"
+    },
+    {
+      "name": "Feliciana",
+      "age": 5,
+      "blood": "O+",
+      "height": "103 cm / 3 ft 5 in"
+    },
+    {
+      "name": "Florinda",
+      "age": 28,
+      "blood": "AB-",
+      "height": "173 cm / 5 ft 8 in"
+    },
+    {
+      "name": "Jesenia",
+      "age": 33,
+      "blood": "A-",
+      "height": "174 cm / 5 ft 8 in"
+    },
+    {
+      "name": "Lorena",
+      "age": 13,
+      "blood": "O-",
+      "height": "153 cm / 5 ft "
+    },
+    {
+      "name": "Rosenda",
+      "age": "2 months",
+      "blood": "A+",
+      "height": "52 cm / 1 ft 9 in"
+    },
+    {
+      "name": "Leonor",
+      "age": 47,
+      "blood": "A-",
+      "height": "167 cm / 5 ft 6 in"
+    },
+    {
+      "name": "Ignacio",
+      "age": 49,
+      "blood": "O-",
+      "height": "174 cm / 5 ft 9 in"
+    },
+    {
+      "name": "Mariana",
+      "age": 62,
+      "blood": "A+",
+      "height": "165 cm / 5 ft 5 in"
+    },
+    {
+      "name": "Balbina",
+      "age": 7,
+      "blood": "O+",
+      "height": "107 cm / 3 ft 6 in"
+    },
+    {
+      "name": "Gloria",
+      "age": 18,
+      "blood": "A+",
+      "height": "160 cm / 5 ft 3 in"
+    },
+    {
+      "name": "Fabio",
+      "age": 30,
+      "blood": "A+",
+      "height": "174 cm / 5 ft 8 in"
+    },
+    {
+      "name": "Yéssica",
+      "age": 23,
+      "blood": "O+",
+      "height": "161 cm / 5 ft 3 in"
+    },
+    {
+      "name": "Amaro",
+      "age": 5,
+      "blood": "A+",
+      "height": "109 cm / 3 ft 7 in"
+    },
+    {
+      "name": "Sergio",
+      "age": 16,
+      "blood": "O+",
+      "height": "173 cm / 5 ft 8 in"
+    },
+    {
+      "name": "Esmeralda",
+      "age": 59,
+      "blood": "O+",
+      "height": "170 cm / 5 ft 7 in"
+    },
+    {
+      "name": "Hilaria",
+      "age": 14,
+      "blood": "A-",
+      "height": "162 cm / 5 ft 4 in"
+    },
+    {
+      "name": "María Dolores",
+      "age": 67,
+      "blood": "A+",
+      "height": "166 cm / 5 ft 5 in"
+    },
+    {
+      "name": "Clara",
+      "age": 68,
+      "blood": "B+",
+      "height": "164 cm / 5 ft 4 in"
+    },
+    {
+      "name": "Mayte",
+      "age": 50,
+      "blood": "O+",
+      "height": "163 cm / 5 ft 4 in"
+    },
+    {
+      "name": "Ana Sofía",
+      "age": 56,
+      "blood": "A+",
+      "height": "155 cm / 5 ft 1 in"
+    },
+    {
+      "name": "Custodio",
+      "age": 26,
+      "blood": "O+",
+      "height": "167 cm / 5 ft 6 in"
+    },
+    {
+      "name": "Magdalena",
+      "age": 82,
+      "blood": "A+",
+      "height": "165 cm / 5 ft 5 in"
+    },
+    {
+      "name": "Irma",
+      "age": 22,
+      "blood": "AB-",
+      "height": "157 cm / 5 ft 2 in"
+    },
+    {
+      "name": "Anselmo",
+      "age": 39,
+      "blood": "A+",
+      "height": "183 cm / 6 ft "
+    },
+    {
+      "name": "Valero",
+      "age": 48,
+      "blood": "A+",
+      "height": "170 cm / 5 ft 7 in"
+    },
+    {
+      "name": "Guadalupe",
+      "age": 39,
+      "blood": "O+",
+      "height": "158 cm / 5 ft 2 in"
+    },
+    {
+      "name": "Bolívar",
+      "age": 41,
+      "blood": "A+",
+      "height": "163 cm / 5 ft 4 in"
+    },
+    {
+      "name": "Dionisia",
+      "age": 21,
+      "blood": "A+",
+      "height": "164 cm / 5 ft 5 in"
+    },
+    {
+      "name": "Lino",
+      "age": 5,
+      "blood": "A+",
+      "height": "112 cm / 3 ft 8 in"
+    },
+    {
+      "name": "Asunción",
+      "age": 49,
+      "blood": "B+",
+      "height": "165 cm / 5 ft 5 in"
+    },
+    {
+      "name": "Jessica",
+      "age": 87,
+      "blood": "O+",
+      "height": "161 cm / 5 ft 3 in"
+    },
+    {
+      "name": "Anacleto",
+      "age": 10,
+      "blood": "A+",
+      "height": "140 cm / 4 ft 7 in"
+    },
+    {
+      "name": "Moisés",
+      "age": 29,
+      "blood": "O+",
+      "height": "180 cm / 5 ft 11 in"
+    },
+    {
+      "name": "Yaiza",
+      "age": 29,
+      "blood": "O+",
+      "height": "170 cm / 5 ft 7 in"
+    },
+    {
+      "name": "Javier",
+      "age": 62,
+      "blood": "A+",
+      "height": "187 cm / 6 ft 2 in"
+    },
+    {
+      "name": "Camila",
+      "age": 28,
+      "blood": "O+",
+      "height": "168 cm / 5 ft 6 in"
+    },
+    {
+      "name": "Balbina",
+      "age": 4,
+      "blood": "O+",
+      "height": "103 cm / 3 ft 5 in"
+    },
+    {
+      "name": "Cosme",
+      "age": 10,
+      "blood": "O-",
+      "height": "143 cm / 4 ft 8 in"
+    },
+    {
+      "name": "Saúl",
+      "age": 5,
+      "blood": "O+",
+      "height": "105 cm / 3 ft 5 in"
+    },
+    {
+      "name": "Mauricio",
+      "age": 36,
+      "blood": "O+",
+      "height": "171 cm / 5 ft 8 in"
+    },
+    {
+      "name": "Sebastián",
+      "age": 9,
+      "blood": "O+",
+      "height": "139 cm / 4 ft 7 in"
+    },
+    {
+      "name": "Jacobo",
+      "age": 7,
+      "blood": "A+",
+      "height": "116 cm / 3 ft 10 in"
+    },
+    {
+      "name": "Yamilé",
+      "age": 25,
+      "blood": "O+",
+      "height": "169 cm / 5 ft 6 in"
+    },
+    {
+      "name": "Isidro",
+      "age": 13,
+      "blood": "A+",
+      "height": "149 cm / 4 ft 11 in"
+    },
+    {
+      "name": "Guiomar",
+      "age": 49,
+      "blood": "O+",
+      "height": "181 cm / 5 ft 11 in"
+    }
+  ];

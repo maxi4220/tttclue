@@ -34,20 +34,29 @@ class Game {
         }
     }
     startGame(io, room){
-        room.players.forEach(player => {
-            
+        room.players.forEach(p => {
+            p.answers = [];
             room.players
                 .map(player => player.socketId)                
                 .map((value) => ({ value, sort: Math.random() }))
                 .sort((a, b) => a.sort - b.sort)
                 .map(({ value }) => value)
                 .forEach((value)=>{
-                    player.answers.push({q: value, a: ""})
+                    if(p.socketId !== value) {
+                        p.answers.push({q: value, a: ""})
+                    }
                 });
 
-            player.answers.splice(player.answers.indexOf(player.answers.find(a=>a.q === player.socketId)), 1);
-            io.to(player.socketId).emit("getCurrentPlayer", this.getPlayerInRoom(room, player.answers[0].q))
+                
+            console.log(p.socketId)
+            const currentPlayer = this.getPlayerInRoom(room, p.answers[0].q);
+            io.to(p.socketId).emit("getCurrentPlayer", {
+                truth1: currentPlayer.truth1,
+                truth2: currentPlayer.truth2,
+                lie: currentPlayer.lie
+            });
             this.startTime = new Date().getTime();
+            console.log("************************")
         });
     }
 }

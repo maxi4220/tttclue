@@ -35,10 +35,10 @@ const playerName = document.getElementById("playerName");
 const truth1 = document.getElementById("truth1");
 const truth2 = document.getElementById("truth2");
 const lie = document.getElementById("lie");
-playerName.value = Math.random() * 500;
-truth1.value = Math.random() * 500;
-truth2.value = Math.random() * 500;
-lie.value = Math.random() * 500;
+playerName.value = dummyPlayers[Math.floor(Math.random() * 50)].name;
+truth1.value = "I am " + dummyPlayers[Math.floor(Math.random() * 50)].age + " years old.";
+truth2.value = "My blood type is " + dummyPlayers[Math.floor(Math.random() * 50)].blood + ".";
+lie.value = "I'm " + dummyPlayers[Math.floor(Math.random() * 50)].height + " tall.";
 
 socket.on("host", function(socketId) {
     const hostGuest = document.getElementById("hostGuest");
