@@ -1,7 +1,36 @@
+const colors = {
+    Reset : "\x1b[0m",
+    Bright : "\x1b[1m",
+    Dim : "\x1b[2m",
+    Underscore : "\x1b[4m",
+    Blink : "\x1b[5m",
+    Reverse : "\x1b[7m",
+    Hidden : "\x1b[8m",
+    FgBlack : "\x1b[30m",
+    FgRed : "\x1b[31m",
+    FgGreen : "\x1b[32m",
+    FgYellow : "\x1b[33m",
+    FgBlue : "\x1b[34m",
+    FgMagenta : "\x1b[35m",
+    FgCyan : "\x1b[36m",
+    FgWhite : "\x1b[37m",
+    BgBlack : "\x1b[40m",
+    BgRed : "\x1b[41m",
+    BgGreen : "\x1b[42m",
+    BgYellow : "\x1b[43m",
+    BgBlue : "\x1b[44m",
+    BgMagenta : "\x1b[45m",
+    BgCyan : "\x1b[46m",
+    BgWhite : "\x1b[47m",
+};
+
+
 let allPlayers = [];
 let socket = io({transports: ['websocket'], upgrade: false});
 let ready = false;
 let gameState = 0; // Game not started
+let currentPlayer;
+let playerClicked;
 
 const startGame = document.createElement("button");
 startGame.appendChild(document.createTextNode("Start game"));
@@ -81,16 +110,51 @@ socket.on("updatePlayers", function(players) {
     updatePlayers(players);
 });
 
-socket.on("getCurrentPlayer", function(currentPlayer){
-    console.log(currentPlayer);
+socket.on("startGame", function(){
+    /*let gameStarting = document.getElementById("gameStarting");
+    gameStarting.style.display = "";*/
+    gameState = 2; //playing
+
+    let btnNotReady = document.getElementById("btnNotReady");
+    let btnReady = document.getElementById("btnReady");
+    if(btnNotReady)
+        btnNotReady.style.display = "none";
+    if(btnReady)
+        btnReady.style.display = "none";
+
+
+    updateScreenGameStarted();
+});
+
+socket.on("getCurrentPlayer", function(player){
+    currentPlayer = player;
+    showCurrentPlayer();
+});
+
+socket.on("playerCorrect", function(socketId){
+    console.log(colors.FgGreen, socketId + " is correct");
+    playerClicked.className = "playerCorrect";
+    socket.emit("showNextPlayer");
+});
+socket.on("playerIncorrect", function(socketId){
+    console.log(colors.FgRed, socketId + " is incorrect");
+    playerClicked.className = "playerIncorrect";
+    window.setTimeout(function(){
+        playerClicked.className = "";
+    },1000);
+});
+socket.on("playerFinished", function(){
+    console.log("You answered all.");
 });
 
 function updatePlayers(players) {
     let ulPlayers = document.getElementById("players");
+    let ulEligiblePlayers = document.getElementById("eligiblePlayers");
     let gameCanStart = false;
     let readyCount = 0;
 
     ulPlayers.innerHTML = "";
+    ulEligiblePlayers.innerHTML = "";
     for(let i = 0; i < players.length; i++){
         let player = players[i];
         let li = document.createElement("li");
@@ -106,14 +170,32 @@ function updatePlayers(players) {
         li.appendChild(document.createTextNode(text));
         ulPlayers.appendChild(li);
         
+        if( player.socketId !== socket.id ){
+            let li2 = document.createElement("li");
+            li2.appendChild(document.createTextNode(player.name));
+            li2.socketId = player.socketId;
+
+            li2.onclick = function(event){
+                let eventObj;
+                if (window.event) {
+                    eventObj = window.event.srcElement;
+                }
+                else {
+                    eventObj = event.target;
+                }
+                socket.emit("choosePlayer", eventObj.socketId);
+                console.log(eventObj.socketId);
+                playerClicked = li2;
+            };
+            ulEligiblePlayers.appendChild(li2);
+        }
+        
         if ( player.socketId !== socket.id && player.ready) {
             readyCount++;
         }
     }
     if(players.length > 1 && readyCount === players.length - 1) {
         gameState = 1; // Game is starting
-        let gameStarting = document.getElementById("gameStarting");
-        gameStarting.style.display = "";
     }
 }
 
@@ -187,4 +269,43 @@ function blockInputs(val){
     truth1.disabled = val;
     truth2.disabled = val;
     lie.disabled = val;
+}
+
+function updateScreenGameStarted() {
+    let eligiblePlayers = document.getElementById("eligiblePlayers");
+    let players = document.getElementById("players");
+    let btnShowNextPlayer = document.getElementById("btnShowNextPlayer");
+    
+
+    players.style.display="none";
+    eligiblePlayers.style.display="";
+    btnShowNextPlayer.style.display="";
+
+    // show next player button (if possible)
+}
+
+function showCurrentPlayer() {
+    let divCurrentPlayer = document.getElementById("currentPlayer");
+    divCurrentPlayer.innerHTML = "";
+
+    let li = document.createElement("li");
+    li.appendChild(document.createTextNode(currentPlayer.truth1));
+    divCurrentPlayer.appendChild(li)
+    let li2 = document.createElement("li");
+    li2.appendChild(document.createTextNode(currentPlayer.truth2));
+    divCurrentPlayer.appendChild(li2)
+    let li3 = document.createElement("li");
+    li3.appendChild(document.createTextNode(currentPlayer.lie));
+    divCurrentPlayer.appendChild(li3)
+    divCurrentPlayer.style.display = "block";
+}
+
+function restart(){
+    let btnReady = document.getElementById("btnReady");
+    btnReady.style.display = "";
+    gameState = 0;
+}
+
+function showNextPlayer(){
+    socket.emit("showNextPlayer");
 }

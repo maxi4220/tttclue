@@ -25,12 +25,21 @@ class Game {
     getPlayerInRoom(room, socketId){
         return room.players.find(a=>a.socketId === socketId)
     }
-    checkAnswer(room, socketId, questionSocketId, answerSocketId) {
+    checkAnswer(io, room, socketId, answerSocketId) {
         const player = this.getPlayerInRoom(room, socketId);
         
         if(player.answeredCount < player.answers.length){
-            player.answers.find(p=>p.q === questionSocketId).a = answerSocketId;
-            this.answeredCount++;
+            
+            if( answerSocketId === player.currentPlayer ){
+                player.answers.find(p=>p.q === player.currentPlayer).a = answerSocketId;
+                player.answeredCount++;
+                io.to(socketId).emit("playerCorrect", answerSocketId);
+            } else {
+                io.to(socketId).emit("playerIncorrect", answerSocketId);
+            }
+            if( player.answeredCount === player.answers.length ) {
+                io.to(socketId).emit("playerFinished");
+            }
         }
     }
     startGame(io, room){
@@ -48,15 +57,14 @@ class Game {
                 });
 
                 
-            console.log(p.socketId)
             const currentPlayer = this.getPlayerInRoom(room, p.answers[0].q);
+            p.currentPlayer = currentPlayer.socketId;
             io.to(p.socketId).emit("getCurrentPlayer", {
                 truth1: currentPlayer.truth1,
                 truth2: currentPlayer.truth2,
                 lie: currentPlayer.lie
             });
             this.startTime = new Date().getTime();
-            console.log("************************")
         });
     }
 }
@@ -90,6 +98,8 @@ class Player {
     answers = [];
     finished = false;
     answeredCount = 0;
+    currentPlayer = "";
+    currentPlayerIndex = 0;
 
     constructor ( socketId, Debug ) {
         this.Debug = Debug;

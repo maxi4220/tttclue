@@ -42,7 +42,7 @@ io.on('connection', (socket) => {
     }
     
     io.emit("updatePlayers", game.rooms[0].players);
-   
+
     // User disconnected
     socket.on('disconnect', () => {
         Debug.clear();
@@ -71,6 +71,11 @@ io.on('connection', (socket) => {
         })
     });
 
+    socket.on("choosePlayer", (answerSocketId)=>{
+        game.checkAnswer(io, game.rooms[0], socket.id, answerSocketId);
+
+    });
+
     socket.on("changeName", (name)=>{
         const player = game.getPlayerInRoom(game.rooms[0], socket.id);
         player.name = name;
@@ -87,6 +92,7 @@ io.on('connection', (socket) => {
         player.truth2 = data.truth2;
         player.lie = data.lie;
         io.emit("updatePlayers", game.rooms[0].players);
+        io.emit("startGame");
         console.log("game starting");
         game.startGame(io, game.rooms[0]);
     });
@@ -105,6 +111,38 @@ io.on('connection', (socket) => {
         const player = game.getPlayerInRoom(game.rooms[0], socket.id);
         player.ready = false;
         io.emit("updatePlayers", game.rooms[0].players);
+    });
+
+    socket.on("showNextPlayer", ()=>{
+        let player = game.getPlayerInRoom(game.rooms[0], socket.id);
+        
+        if( player.answeredCount < player.answers.length ){
+            let nextAvailable;
+            while ( !nextAvailable ) {
+                nextAvailable = player.answers[player.currentPlayerIndex];
+                if ( nextAvailable.a === "" && nextAvailable.q !== player.currentPlayer ) {
+
+                //let nextAvailable = player.answers.find(a=>a.a === "" && a.q !== player.currentPlayer);
+                
+                    let nextPlayer = game.getPlayerInRoom(game.rooms[0], nextAvailable.q);
+                    
+                    player.currentPlayer = nextAvailable.q;
+                    socket.emit("getCurrentPlayer", {
+                        truth1: nextPlayer.truth1,
+                        truth2: nextPlayer.truth2,
+                        lie: nextPlayer.lie
+                    });
+                } 
+                if( player.currentPlayerIndex < player.answers.length - 1 ) {
+                    player.currentPlayerIndex++;
+                } else {
+                    player.currentPlayerIndex = 0;
+                }
+                if( !player.answers.find(a=>a.a === "" && a.q !== player.currentPlayer) ) {
+                    break;
+                }
+            }
+        }
     });
 
     Debug.add({

@@ -1,6 +1,17 @@
+@keyframes incorrect{
+    from {background-color: lightgray;}
+    to {background-color: red;}
+}
 .ready {
     background-color:limegreen;
 }
 .notReady {
     background-color:burlywood;
+}
+.playerCorrect {
+    background-color: limegreen;
+}
+.playerIncorrect {
+    animation-name: incorrect;
+    animation-duration: 0.2s;
 }

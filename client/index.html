@@ -19,12 +19,22 @@
         <button onclick="setNotReady()" style="display: none"; id="btnNotReady">NOT Ready</button>
     </div>
 
-    <div id="gameStarting" style="display: none">Starting game in 5</div>
+    <!--div id="gameStarting" style="display: none">Starting game in 5</div-->
 
     <div id="playerName"></div>
+    
+    <ul style="display:none;width:300px; position:absolute; left: calc(50% - 150px); top: calc(50% - 50px); background-color: white;" id="currentPlayer"></ul>
+
     <ul style="width:300px; position:fixed; left: 0; top: 50%; background-color: lightgrey;" id="players"></ul>
-    <div style="width:300px; position:fixed; right: 0; top: 0; background-color: lightgrey;" id="debug"></div>
+    <ul style="display:none;width:300px; position:fixed; left: 0; top: 50%; background-color: lightgrey;" id="eligiblePlayers"></ul>
+    
     <div style="width:300px; position:fixed; bottom: 0; left: 0; background-color: lightgrey;" id="socketId"></div>
+    
+    <div style="width:300px; position:fixed; right: 0; top: 0; background-color: lightgrey;" id="debug"></div>
+    
+    <button style="display:none;position:fixed; right: 0; top: 50%; background-color: lightgrey;" 
+            onclick="showNextPlayer()" id="btnShowNextPlayer">Show NEXT player</button> 
+
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="data.js"></script>
     <script type="text/javascript" src="client.js"></script>
