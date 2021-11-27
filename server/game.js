@@ -34,11 +34,18 @@ class Game {
                 player.answers.find(p=>p.q === player.currentPlayer).a = answerSocketId;
                 player.answeredCount++;
                 io.to(socketId).emit("playerCorrect", answerSocketId);
+                room.totalAnswers++;
+                let totalAnswers = player.answers.length * ( player.answers.length + 1 );
+
+                if ( room.totalAnswers === totalAnswers ) {
+                    io.emit("gameFinished", "");
+                }
+
             } else {
                 io.to(socketId).emit("playerIncorrect", answerSocketId);
             }
             if( player.answeredCount === player.answers.length ) {
-                io.to(socketId).emit("playerFinished");
+                io.to(socketId).emit("playerFinished"); // send scoreboard
             }
         }
     }
@@ -71,8 +78,10 @@ class Game {
 
 class Room {
     Debug = null;
+    gameState = 0;
     hostId = {};
     players = [];
+    totalAnswers = 0;
 
     constructor( playerId, Debug) {
         this.Debug = Debug;

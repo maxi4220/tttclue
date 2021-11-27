@@ -125,32 +125,33 @@ socket.on("startGame", function(){
 
     updateScreenGameStarted();
 });
-
 socket.on("getCurrentPlayer", function(player){
     currentPlayer = player;
     showCurrentPlayer();
 });
-
 socket.on("playerCorrect", function(socketId){
     console.log(colors.FgGreen, socketId + " is correct");
-    playerClicked.className = "playerCorrect";
+    playerClicked.classList.add("playerCorrect");
+    playerClicked.onclick = undefined;
     socket.emit("showNextPlayer");
 });
 socket.on("playerIncorrect", function(socketId){
     console.log(colors.FgRed, socketId + " is incorrect");
     playerClicked.className = "playerIncorrect";
     window.setTimeout(function(){
-        playerClicked.className = "";
+        playerClicked.classList.remove("playerIncorrect");
     },1000);
 });
 socket.on("playerFinished", function(){
     console.log("You answered all.");
 });
+socket.on("gameFinished", function(){
+    console.log("Game finished");
+});
 
 function updatePlayers(players) {
     let ulPlayers = document.getElementById("players");
     let ulEligiblePlayers = document.getElementById("eligiblePlayers");
-    let gameCanStart = false;
     let readyCount = 0;
 
     ulPlayers.innerHTML = "";
@@ -185,7 +186,7 @@ function updatePlayers(players) {
                 }
                 socket.emit("choosePlayer", eventObj.socketId);
                 console.log(eventObj.socketId);
-                playerClicked = li2;
+                playerClicked = eventObj;
             };
             ulEligiblePlayers.appendChild(li2);
         }

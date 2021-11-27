@@ -27,129 +27,135 @@ server.listen(port, ()=> {
 // The user connects
 io.on('connection', (socket) => {
     Debug.clear();
-    // console.log(colors.FgGreen, 'A user just connected. ' + socket.id, colors.Reset);
-    socket.join("room");
-    socket.data.host = false;
+    
     let room = io.of("/").adapter.rooms.get("room");
-    
-    if ( room.size == 1 ) {
-        game.createRoom(socket.id);
-        hostSocket = socket;
-        socket.data.host = true;
-        socket.emit("host", socket.id);
-    } else {
-        game.addPlayerToRoom(socket.id, game.rooms[0]);
-    }
-    
-    io.emit("updatePlayers", game.rooms[0].players);
 
-    // User disconnected
-    socket.on('disconnect', () => {
-        Debug.clear();
-        let room = io.of("/").adapter.rooms.get("room");
-        
-        game.rooms[0].removePlayer(socket.id);
+    if ( !room || ( room && game.rooms[0].gameState === 0 ) ) {
+        socket.join("room");
+        socket.data.host = false;
 
-        io.emit("updatePlayers", game.rooms[0].players);
-        // Choose another host if players available
-        if ( socket.data.host && room.size > 0) {
-            
-            io.of("/")
-            .in("room")
-            .fetchSockets()
-            .then((sockets)=>{
-                hostSocket = sockets[0];
-                sockets[0].data.host = true;
-                sockets[0].emit("host", sockets[0].id);
-            });
-            
+        room = io.of("/").adapter.rooms.get("room");
+
+        if ( room.size == 1 ) {
+            game.createRoom(socket.id);
+            hostSocket = socket;
+            socket.data.host = true;
+            socket.emit("host", socket.id);
+        } else {
+            game.addPlayerToRoom(socket.id, game.rooms[0]);
         }
+        
+        io.emit("updatePlayers", game.rooms[0].players);
+        socket.on('disconnect', () => {
+            Debug.clear();
+            let room = io.of("/").adapter.rooms.get("room");
+            
+            game.rooms[0].removePlayer(socket.id);
+
+            io.emit("updatePlayers", game.rooms[0].players);
+            // Choose another host if players available
+            if ( socket.data.host && room.size > 0) {
+                
+                io.of("/")
+                .in("room")
+                .fetchSockets()
+                .then((sockets)=>{
+                    hostSocket = sockets[0];
+                    sockets[0].data.host = true;
+                    sockets[0].emit("host", sockets[0].id);
+                });
+                
+            }
+            Debug.add({
+                id: "ID: room",
+                name: "Room",
+                values: ["Host: " + hostSocket.id, "Players: " + io.of("/").in("room").adapter.sids.size]
+            })
+        });
+        socket.on("choosePlayer", (answerSocketId)=>{
+            game.checkAnswer(io, game.rooms[0], socket.id, answerSocketId);
+
+        });
+        socket.on("changeName", (name)=>{
+            const player = game.getPlayerInRoom(game.rooms[0], socket.id);
+            player.name = name;
+            io.emit("updatePlayers", game.rooms[0].players);
+            console.log(name);
+        });
+        socket.on("startGame", (data)=>{
+            const player = game.getPlayerInRoom(game.rooms[0], socket.id);
+            player.name = data.name;
+            player.image = data.image;
+            player.ready = data.ready;
+            player.truth1 = data.truth1;
+            player.truth2 = data.truth2;
+            player.lie = data.lie;
+            
+            game.rooms[0].players
+                .map( p => p.socketId )
+                .forEach( socketId => {
+                    io.to( socketId ).emit("updatePlayers", 
+                        game.rooms[0].players
+                            .map(player => ({ ...player, sort: Math.random() }))
+                            .sort((a, b) => a.sort - b.sort));
+                })
+
+            io.emit("startGame");
+            game.startGame(io, game.rooms[0]);
+        });
+        socket.on("setReady", (data)=>{
+            const player = game.getPlayerInRoom(game.rooms[0], socket.id);
+            player.name = data.name;
+            player.image = data.image;
+            player.ready = data.ready;
+            player.truth1 = data.truth1;
+            player.truth2 = data.truth2;
+            player.lie = data.lie;
+            io.emit("updatePlayers", game.rooms[0].players);
+        });
+        socket.on("setNotReady", ()=>{
+            const player = game.getPlayerInRoom(game.rooms[0], socket.id);
+            player.ready = false;
+            io.emit("updatePlayers", game.rooms[0].players);
+        });
+        socket.on("showNextPlayer", ()=>{
+            let player = game.getPlayerInRoom(game.rooms[0], socket.id);
+            
+            if( player.answeredCount < player.answers.length ){
+                let nextAvailable;
+                let nextPlayer;
+                while ( !nextPlayer ) {
+                    nextAvailable = player.answers[player.currentPlayerIndex];
+                    
+                    if ( nextAvailable.a === "" && nextAvailable.q !== player.currentPlayer ) {
+
+                        nextPlayer = game.getPlayerInRoom(game.rooms[0], nextAvailable.q);
+                        console.log(nextPlayer.socketId)
+                        player.currentPlayer = nextAvailable.q;
+                        socket.emit("getCurrentPlayer", {
+                            truth1: nextPlayer.truth1,
+                            truth2: nextPlayer.truth2,
+                            lie: nextPlayer.lie
+                        });
+                    } 
+                    
+                    if( player.currentPlayerIndex < player.answers.length - 1 ) {
+                        player.currentPlayerIndex++;
+                    } else {
+                        player.currentPlayerIndex = 0;
+                        if( !player.answers.find(a => a.a === "" && a.q !== player.socketId) ) {
+                            break;
+                        }
+                    }
+                }
+            }
+        });
         Debug.add({
             id: "ID: room",
             name: "Room",
             values: ["Host: " + hostSocket.id, "Players: " + io.of("/").in("room").adapter.sids.size]
-        })
-    });
-
-    socket.on("choosePlayer", (answerSocketId)=>{
-        game.checkAnswer(io, game.rooms[0], socket.id, answerSocketId);
-
-    });
-
-    socket.on("changeName", (name)=>{
-        const player = game.getPlayerInRoom(game.rooms[0], socket.id);
-        player.name = name;
-        io.emit("updatePlayers", game.rooms[0].players);
-        console.log(name);
-    });
-
-    socket.on("startGame", (data)=>{
-        const player = game.getPlayerInRoom(game.rooms[0], socket.id);
-        player.name = data.name;
-        player.image = data.image;
-        player.ready = data.ready;
-        player.truth1 = data.truth1;
-        player.truth2 = data.truth2;
-        player.lie = data.lie;
-        io.emit("updatePlayers", game.rooms[0].players);
-        io.emit("startGame");
-        console.log("game starting");
-        game.startGame(io, game.rooms[0]);
-    });
-
-    socket.on("setReady", (data)=>{
-        const player = game.getPlayerInRoom(game.rooms[0], socket.id);
-        player.name = data.name;
-        player.image = data.image;
-        player.ready = data.ready;
-        player.truth1 = data.truth1;
-        player.truth2 = data.truth2;
-        player.lie = data.lie;
-        io.emit("updatePlayers", game.rooms[0].players);
-    });
-    socket.on("setNotReady", ()=>{
-        const player = game.getPlayerInRoom(game.rooms[0], socket.id);
-        player.ready = false;
-        io.emit("updatePlayers", game.rooms[0].players);
-    });
-
-    socket.on("showNextPlayer", ()=>{
-        let player = game.getPlayerInRoom(game.rooms[0], socket.id);
-        
-        if( player.answeredCount < player.answers.length ){
-            let nextAvailable;
-            while ( !nextAvailable ) {
-                nextAvailable = player.answers[player.currentPlayerIndex];
-                if ( nextAvailable.a === "" && nextAvailable.q !== player.currentPlayer ) {
-
-                //let nextAvailable = player.answers.find(a=>a.a === "" && a.q !== player.currentPlayer);
-                
-                    let nextPlayer = game.getPlayerInRoom(game.rooms[0], nextAvailable.q);
-                    
-                    player.currentPlayer = nextAvailable.q;
-                    socket.emit("getCurrentPlayer", {
-                        truth1: nextPlayer.truth1,
-                        truth2: nextPlayer.truth2,
-                        lie: nextPlayer.lie
-                    });
-                } 
-                if( player.currentPlayerIndex < player.answers.length - 1 ) {
-                    player.currentPlayerIndex++;
-                } else {
-                    player.currentPlayerIndex = 0;
-                }
-                if( !player.answers.find(a=>a.a === "" && a.q !== player.currentPlayer) ) {
-                    break;
-                }
-            }
-        }
-    });
-
-    Debug.add({
-        id: "ID: room",
-        name: "Room",
-        values: ["Host: " + hostSocket.id, "Players: " + io.of("/").in("room").adapter.sids.size]
-    })
+        });
+    }
 });
 
 if( Debug.enabled ) {
