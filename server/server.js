@@ -80,7 +80,6 @@ io.on('connection', (socket) => {
             const player = game.getPlayerInRoom(game.rooms[0], socket.id);
             player.name = name;
             io.emit("updatePlayers", game.rooms[0].players);
-            console.log(name);
         });
         socket.on("startGame", (data)=>{
             const player = game.getPlayerInRoom(game.rooms[0], socket.id);
@@ -130,7 +129,6 @@ io.on('connection', (socket) => {
                     if ( nextAvailable.a === "" && nextAvailable.q !== player.currentPlayer ) {
 
                         nextPlayer = game.getPlayerInRoom(game.rooms[0], nextAvailable.q);
-                        console.log(nextPlayer.socketId)
                         player.currentPlayer = nextAvailable.q;
                         socket.emit("getCurrentPlayer", {
                             truth1: nextPlayer.truth1,

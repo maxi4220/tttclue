@@ -1,30 +1,3 @@
-const colors = {
-    Reset : "\x1b[0m",
-    Bright : "\x1b[1m",
-    Dim : "\x1b[2m",
-    Underscore : "\x1b[4m",
-    Blink : "\x1b[5m",
-    Reverse : "\x1b[7m",
-    Hidden : "\x1b[8m",
-    FgBlack : "\x1b[30m",
-    FgRed : "\x1b[31m",
-    FgGreen : "\x1b[32m",
-    FgYellow : "\x1b[33m",
-    FgBlue : "\x1b[34m",
-    FgMagenta : "\x1b[35m",
-    FgCyan : "\x1b[36m",
-    FgWhite : "\x1b[37m",
-    BgBlack : "\x1b[40m",
-    BgRed : "\x1b[41m",
-    BgGreen : "\x1b[42m",
-    BgYellow : "\x1b[43m",
-    BgBlue : "\x1b[44m",
-    BgMagenta : "\x1b[45m",
-    BgCyan : "\x1b[46m",
-    BgWhite : "\x1b[47m",
-};
-
-
 let allPlayers = [];
 let socket = io({transports: ['websocket'], upgrade: false});
 let ready = false;
@@ -34,6 +7,7 @@ let playerClicked;
 
 const startGame = document.createElement("button");
 startGame.appendChild(document.createTextNode("Start game"));
+startGame.className = "commonButton";
 startGame.onclick = function(){
     if(validateData()){
         updatePlayers(allPlayers);
@@ -130,23 +104,47 @@ socket.on("getCurrentPlayer", function(player){
     showCurrentPlayer();
 });
 socket.on("playerCorrect", function(socketId){
-    console.log(colors.FgGreen, socketId + " is correct");
+    console.log(socketId + " is correct");
     playerClicked.classList.add("playerCorrect");
     playerClicked.onclick = undefined;
     socket.emit("showNextPlayer");
 });
 socket.on("playerIncorrect", function(socketId){
-    console.log(colors.FgRed, socketId + " is incorrect");
+    console.log(socketId + " is incorrect");
     playerClicked.className = "playerIncorrect";
     window.setTimeout(function(){
         playerClicked.classList.remove("playerIncorrect");
     },1000);
 });
-socket.on("playerFinished", function(){
-    console.log("You answered all.");
+
+socket.on("playerFinished", function(scoreboard, socketId){
+    
+    if ( socketId === socket.id ) {
+        gameState = 3; // player finished
+    }
+    
+    if ( gameState === 3 ) {
+
+        console.log("You answered all.");
+
+        let btnShowNextPlayer = document.getElementById("btnShowNextPlayer");
+        btnShowNextPlayer.style.display = "none";
+
+        let currentPlayerContainer = document.getElementById("currentPlayerContainer");
+        currentPlayerContainer.style.display = "none";
+
+        let eligiblePlayers = document.getElementById("eligiblePlayers");
+        eligiblePlayers.style.display = "none";
+
+        updateScoreboard(scoreboard);
+
+    }
 });
+
 socket.on("gameFinished", function(){
     console.log("Game finished");
+    gameState = 4; // game finished
+    // enable button to play again on the host
 });
 
 function updatePlayers(players) {
@@ -286,6 +284,7 @@ function updateScreenGameStarted() {
 }
 
 function showCurrentPlayer() {
+    let currentPlayerContainer = document.getElementById("currentPlayerContainer");
     let divCurrentPlayer = document.getElementById("currentPlayer");
     divCurrentPlayer.innerHTML = "";
 
@@ -298,7 +297,7 @@ function showCurrentPlayer() {
     let li3 = document.createElement("li");
     li3.appendChild(document.createTextNode(currentPlayer.lie));
     divCurrentPlayer.appendChild(li3)
-    divCurrentPlayer.style.display = "block";
+    currentPlayerContainer.style.display = "block";
 }
 
 function restart(){
@@ -309,4 +308,39 @@ function restart(){
 
 function showNextPlayer(){
     socket.emit("showNextPlayer");
+}
+
+function updateScoreboard(scoreboard) {
+    
+    let objScoreboard = document.getElementById("scoreboard");
+    objScoreboard.innerHTML = "";
+    
+    for(let i = 0; i < scoreboard.length; i++) {
+
+        let player = scoreboard[i];
+
+        let li = document.createElement("li");
+        
+        let position = document.createElement("span");
+        let name = document.createElement("span");
+        let points = document.createElement("span");
+        let time = document.createElement("span");
+
+        position.appendChild(document.createTextNode( parseInt(i+1)+". "));
+        name.appendChild(document.createTextNode(player.name+" - "));
+        points.appendChild(document.createTextNode(player.points+" pts. "));
+        time.appendChild(document.createTextNode(player.time+" ms."));
+
+        li.appendChild(position);
+        li.appendChild(name);
+        li.appendChild(points);
+        li.appendChild(time);
+
+        objScoreboard.appendChild(li);
+
+    }
+
+
+    objScoreboard.style.display = "";
+
 }

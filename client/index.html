@@ -8,32 +8,42 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <input type="text" placeholder="Enter your name" id="playerName" onchange="sendName(event)" autocomplete="chrome-off" autocomplete="off" />
-    <br/>
-    <input type="text" placeholder="Truth 1" id="truth1" autocomplete="chrome-off" autocomplete="off" /><br/>
-    <input type="text" placeholder="Truth 2" id="truth2" autocomplete="chrome-off" autocomplete="off" /><br/>
-    <input type="text" placeholder="Lie" id="lie" autocomplete="chrome-off" autocomplete="off" /><br/>
+    <div class="inputContainer">
+        <input type="text" placeholder="Enter your name" id="playerName" onchange="sendName(event)" autocomplete="chrome-off" autocomplete="off" /><br/>
+        <input type="text" placeholder="Truth 1" id="truth1" autocomplete="chrome-off" autocomplete="off" /><br/>
+        <input type="text" placeholder="Truth 2" id="truth2" autocomplete="chrome-off" autocomplete="off" /><br/>
+        <input type="text" placeholder="Lie" id="lie" autocomplete="chrome-off" autocomplete="off" /><br/>
 
-    <div id="hostGuest"> 
-        <button onclick="setReady()" id="btnReady">Ready</button> 
-        <button onclick="setNotReady()" style="display: none"; id="btnNotReady">NOT Ready</button>
+        <div id="hostGuest"> 
+        
+            <button onclick="setReady()" class="commonButton"
+                    id="btnReady">Ready</button> 
+    
+            <button onclick="setNotReady()" style="display: none"; class="commonButton"
+                    id="btnNotReady">NOT Ready</button>
+        </div>
     </div>
 
-    <!--div id="gameStarting" style="display: none">Starting game in 5</div-->
-
     <div id="playerName"></div>
+    <div id="currentPlayerContainer" style="display: none;">
+        <ul id="currentPlayer"></ul>
+    </div>
+    <ul id="players"></ul>        
+    <ul id="eligiblePlayers" style="display:none;"></ul>
     
-    <ul style="display:none;width:300px; position:absolute; left: calc(50% - 150px); top: calc(50% - 50px); background-color: white;" id="currentPlayer"></ul>
+    <div style="width:300px; position:fixed; bottom: 0; left: 0; background-color: lightgrey;" 
+         id="socketId"></div>
+    
+    <div style="display:none;width:300px; position:fixed; right: 0; top: 0; background-color: lightgrey;" 
+         id="debug"></div>
 
-    <ul style="width:300px; position:fixed; left: 0; top: 50%; background-color: lightgrey;" id="players"></ul>
-    <ul style="display:none;width:300px; position:fixed; left: 0; top: 50%; background-color: lightgrey;" id="eligiblePlayers"></ul>
+    <ul style="display:none;margin:auto; background-color: white; width: 400px;" 
+        id="scoreboard"></ul>
     
-    <div style="width:300px; position:fixed; bottom: 0; left: 0; background-color: lightgrey;" id="socketId"></div>
-    
-    <div style="width:300px; position:fixed; right: 0; top: 0; background-color: lightgrey;" id="debug"></div>
-    
-    <button style="display:none;position:fixed; right: 0; top: 50%; background-color: lightgrey;" 
-            onclick="showNextPlayer()" id="btnShowNextPlayer">Show NEXT player</button> 
+    <button style="display:none;" 
+            class="commonButton"
+            onclick="showNextPlayer()" 
+            id="btnShowNextPlayer">Show NEXT player</button>
 
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="data.js"></script>
