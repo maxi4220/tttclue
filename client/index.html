@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="inputContainer">
-        <input type="text" placeholder="Enter your name" id="playerName" onchange="sendName(event)" autocomplete="chrome-off" autocomplete="off" /><br/>
+        <input maxlength="20" type="text" placeholder="Enter your name" id="playerName" onkeyup="sendName(event)" autocomplete="chrome-off" autocomplete="off" /><br/>
         <input type="text" placeholder="Truth 1" id="truth1" autocomplete="chrome-off" autocomplete="off" /><br/>
         <input type="text" placeholder="Truth 2" id="truth2" autocomplete="chrome-off" autocomplete="off" /><br/>
         <input type="text" placeholder="Lie" id="lie" autocomplete="chrome-off" autocomplete="off" /><br/>
@@ -31,19 +31,20 @@
     <ul id="players"></ul>        
     <ul id="eligiblePlayers" style="display:none;"></ul>
     
-    <div style="width:300px; position:fixed; bottom: 0; left: 0; background-color: lightgrey;" 
+    <div style="display:none;width:300px; position:fixed; bottom: 0; left: 0; background-color: lightgrey;" 
          id="socketId"></div>
     
     <div style="display:none;width:300px; position:fixed; right: 0; top: 0; background-color: lightgrey;" 
          id="debug"></div>
 
-    <ul style="display:none;margin:auto; background-color: white; width: 400px;" 
-        id="scoreboard"></ul>
+    <div style="display:none;" id="scoreboardContainer">
+        <ul style="margin:auto; width: 700px;" id="scoreboard"></ul>
+    </div>
     
     <button style="display:none;" 
             class="commonButton"
             onclick="showNextPlayer()" 
-            id="btnShowNextPlayer">Show NEXT player</button>
+            id="btnShowNextPlayer">Show NEXT</button>
 
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="data.js"></script>

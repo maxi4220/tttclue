@@ -42,6 +42,7 @@ playerName.value = dummyPlayers[Math.floor(Math.random() * 50)].name;
 truth1.value = "I am " + dummyPlayers[Math.floor(Math.random() * 50)].age + " years old.";
 truth2.value = "My blood type is " + dummyPlayers[Math.floor(Math.random() * 50)].blood + ".";
 lie.value = "I'm " + dummyPlayers[Math.floor(Math.random() * 50)].height + " tall.";
+socket.emit("changeName", playerName.value);
 
 socket.on("host", function(socketId) {
     const hostGuest = document.getElementById("hostGuest");
@@ -164,8 +165,6 @@ function updatePlayers(players) {
         }
         let text = "";        
         text = player.name || player.socketId;
-        text += " - ";
-        text += player.ready ? "Ready" : "Not ready";
         li.appendChild(document.createTextNode(text));
         ulPlayers.appendChild(li);
         
@@ -311,7 +310,7 @@ function showNextPlayer(){
 }
 
 function updateScoreboard(scoreboard) {
-    
+    let objScoreboardContainer = document.getElementById("scoreboardContainer");
     let objScoreboard = document.getElementById("scoreboard");
     objScoreboard.innerHTML = "";
     
@@ -341,6 +340,6 @@ function updateScoreboard(scoreboard) {
     }
 
 
-    objScoreboard.style.display = "";
+    objScoreboardContainer.style.display = "";
 
 }

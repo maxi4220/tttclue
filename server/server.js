@@ -50,27 +50,31 @@ io.on('connection', (socket) => {
             Debug.clear();
             let room = io.of("/").adapter.rooms.get("room");
             
-            game.rooms[0].removePlayer(socket.id);
+            if(room){
+                game.rooms[0].removePlayer(socket.id);
 
-            io.emit("updatePlayers", game.rooms[0].players);
-            // Choose another host if players available
-            if ( socket.data.host && room.size > 0) {
-                
-                io.of("/")
-                .in("room")
-                .fetchSockets()
-                .then((sockets)=>{
-                    hostSocket = sockets[0];
-                    sockets[0].data.host = true;
-                    sockets[0].emit("host", sockets[0].id);
-                });
-                
+                io.emit("updatePlayers", game.rooms[0].players);
+                // Choose another host if players available
+                if ( socket.data.host && room.size > 0) {
+                    
+                    io.of("/")
+                    .in("room")
+                    .fetchSockets()
+                    .then((sockets)=>{
+                        hostSocket = sockets[0];
+                        sockets[0].data.host = true;
+                        sockets[0].emit("host", sockets[0].id);
+                    });
+                    
+                }
+                Debug.add({
+                    id: "ID: room",
+                    name: "Room",
+                    values: ["Host: " + hostSocket.id, "Players: " + io.of("/").in("room").adapter.sids.size]
+                })
+            } else {
+                game.rooms = [];
             }
-            Debug.add({
-                id: "ID: room",
-                name: "Room",
-                values: ["Host: " + hostSocket.id, "Players: " + io.of("/").in("room").adapter.sids.size]
-            })
         });
         socket.on("choosePlayer", (answerSocketId)=>{
             game.checkAnswer(io, game.rooms[0], socket.id, answerSocketId);
@@ -78,8 +82,10 @@ io.on('connection', (socket) => {
         });
         socket.on("changeName", (name)=>{
             const player = game.getPlayerInRoom(game.rooms[0], socket.id);
-            player.name = name;
-            io.emit("updatePlayers", game.rooms[0].players);
+            if(player){
+                player.name = name;
+                io.emit("updatePlayers", game.rooms[0].players);
+            }
         });
         socket.on("startGame", (data)=>{
             const player = game.getPlayerInRoom(game.rooms[0], socket.id);
@@ -162,5 +168,5 @@ if( Debug.enabled ) {
             // console.log(game.rooms[0].players)
         }
         io.emit("debug", Debug.debugItems);
-    }, 100);
+    }, 1000);
 }
