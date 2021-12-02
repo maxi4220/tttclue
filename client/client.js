@@ -90,13 +90,8 @@ socket.on("startGame", function(){
     gameStarting.style.display = "";*/
     gameState = 2; //playing
 
-    let btnNotReady = document.getElementById("btnNotReady");
-    let btnReady = document.getElementById("btnReady");
-    if(btnNotReady)
-        btnNotReady.style.display = "none";
-    if(btnReady)
-        btnReady.style.display = "none";
-
+    let idInputContainer = document.getElementById("idInputContainer");
+    idInputContainer.style.display = "none"
 
     updateScreenGameStarted();
 });
@@ -169,7 +164,7 @@ function updatePlayers(players) {
         ulPlayers.appendChild(li);
         
         if( player.socketId !== socket.id ){
-            let li2 = document.createElement("li");
+            let li2 = document.createElement("div");
             li2.appendChild(document.createTextNode(player.name));
             li2.socketId = player.socketId;
 
@@ -286,6 +281,10 @@ function showCurrentPlayer() {
     let currentPlayerContainer = document.getElementById("currentPlayerContainer");
     let divCurrentPlayer = document.getElementById("currentPlayer");
     divCurrentPlayer.innerHTML = "";
+
+    let liIndex = document.createElement("li");
+    liIndex.appendChild(document.createTextNode(currentPlayer.currentPlayerIndex));
+    divCurrentPlayer.appendChild(liIndex)
 
     let li = document.createElement("li");
     li.appendChild(document.createTextNode(currentPlayer.truth1));

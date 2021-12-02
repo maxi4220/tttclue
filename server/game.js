@@ -96,7 +96,8 @@ class Game {
             io.to(p.socketId).emit("getCurrentPlayer", {
                 truth1: currentPlayer.truth1,
                 truth2: currentPlayer.truth2,
-                lie: currentPlayer.lie
+                lie: currentPlayer.lie, 
+                currentPlayerIndex: currentPlayer.currentPlayerIndex + 1
             });
             p.startTime = new Date().getTime();
         });

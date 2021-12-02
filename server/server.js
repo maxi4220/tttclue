@@ -125,13 +125,13 @@ io.on('connection', (socket) => {
         });
         socket.on("showNextPlayer", ()=>{
             let player = game.getPlayerInRoom(game.rooms[0], socket.id);
-            
+
             if( player.answeredCount < player.answers.length ){
                 let nextAvailable;
                 let nextPlayer;
+                
                 while ( !nextPlayer ) {
                     nextAvailable = player.answers[player.currentPlayerIndex];
-                    
                     if ( nextAvailable.a === "" && nextAvailable.q !== player.currentPlayer ) {
 
                         nextPlayer = game.getPlayerInRoom(game.rooms[0], nextAvailable.q);
@@ -139,7 +139,8 @@ io.on('connection', (socket) => {
                         socket.emit("getCurrentPlayer", {
                             truth1: nextPlayer.truth1,
                             truth2: nextPlayer.truth2,
-                            lie: nextPlayer.lie
+                            lie: nextPlayer.lie,
+                            currentPlayerIndex: player.currentPlayerIndex + 1
                         });
                     } 
                     
@@ -147,7 +148,7 @@ io.on('connection', (socket) => {
                         player.currentPlayerIndex++;
                     } else {
                         player.currentPlayerIndex = 0;
-                        if( !player.answers.find(a => a.a === "" && a.q !== player.socketId) ) {
+                        if( !player.answers.find(a => a.a === "" && a.q !== player.currentPlayer) ) {
                             break;
                         }
                     }
