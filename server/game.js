@@ -79,6 +79,7 @@ class Game {
         room.totalAnswers = 0;
         room.players.forEach(p => {
             p.answers = [];
+            p.answeredCount = 0;
             room.players
                 .map(player => player.socketId)                
                 .map((value) => ({ value, sort: Math.random() }))
@@ -90,7 +91,7 @@ class Game {
                     }
                 });
 
-                
+            console.log(p.answers);
             const currentPlayer = this.getPlayerInRoom(room, p.answers[0].q);
             p.currentPlayer = currentPlayer.socketId;
             io.to(p.socketId).emit("getCurrentPlayer", {

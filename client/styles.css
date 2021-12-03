@@ -239,3 +239,10 @@ input {
     border-radius: 3px;
     
 }
+#playAgainContainer {
+    width: 100%;
+}
+#btnPlayAgain {
+    margin: 1em;
+    margin-left: calc(50% - 72px);
+}

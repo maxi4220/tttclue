@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+    <div id="playAgainContainer" style="display: none">
+        <button id="btnPlayAgain" class="commonButton" onclick="restart()">Play Again</button>
+    </div>
     <div id="idInputContainer" class="inputContainer">
         <input maxlength="20" type="text" placeholder="Enter your name" id="playerName" onkeyup="sendName(event)" autocomplete="chrome-off" autocomplete="off" /><br/>
         <input type="text" placeholder="Truth 1" id="truth1" autocomplete="chrome-off" autocomplete="off" /><br/>

@@ -4,10 +4,12 @@ let ready = false;
 let gameState = 0; // Game not started
 let currentPlayer;
 let playerClicked;
+let host = false;
 
 const startGame = document.createElement("button");
 startGame.appendChild(document.createTextNode("Start game"));
 startGame.className = "commonButton";
+startGame.id = "btnStartGame";
 startGame.onclick = function(){
     if(validateData()){
         updatePlayers(allPlayers);
@@ -49,6 +51,7 @@ socket.on("host", function(socketId) {
     hostGuest.innerHTML = "";
     hostGuest.appendChild(startGame);
     document.getElementById("socketId").innerHTML = socketId;    
+    host = true;
 });
 
 socket.on("debug", function(data) {
@@ -120,7 +123,7 @@ socket.on("playerFinished", function(scoreboard, socketId){
     }
     
     if ( gameState === 3 ) {
-
+        
         console.log("You answered all.");
 
         let btnShowNextPlayer = document.getElementById("btnShowNextPlayer");
@@ -138,8 +141,10 @@ socket.on("playerFinished", function(scoreboard, socketId){
 });
 
 socket.on("gameFinished", function(){
-    console.log("Game finished");
     gameState = 4; // game finished
+    let playAgainContainer = document.getElementById("playAgainContainer");
+    playAgainContainer.style.display = "";
+    setNotReady();
     // enable button to play again on the host
 });
 
@@ -248,8 +253,10 @@ function setNotReady() {
     blockInputs(false);
     const btnReady = document.getElementById("btnReady");
     const btnNotReady = document.getElementById("btnNotReady");
-    btnReady.style.display = "";
-    btnNotReady.style.display = "none";
+    if(btnNotReady)
+        btnReady.style.display = "";
+    if(btnNotReady)
+        btnNotReady.style.display = "none";
     ready = false;
     socket.emit("setNotReady");
 }
@@ -300,7 +307,27 @@ function showCurrentPlayer() {
 
 function restart(){
     let btnReady = document.getElementById("btnReady");
-    btnReady.style.display = "";
+    let btnStartGame = document.getElementById("btnStartGame");
+    let objScoreboardContainer = document.getElementById("scoreboardContainer");
+    let idInputContainer = document.getElementById("idInputContainer");
+    let playAgainContainer = document.getElementById("playAgainContainer");
+    
+    
+
+    let ulPlayers = document.getElementById("players");
+    ulPlayers.style.display = "";
+
+    objScoreboardContainer.style.display = "none";
+    playAgainContainer.style.display = "none";
+    
+    idInputContainer.style.display = "";
+    
+
+    if(btnReady)
+        btnReady.style.display = "";
+    if(btnStartGame)
+        btnStartGame.style.display = "";
+
     gameState = 0;
 }
 
