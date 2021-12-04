@@ -142,6 +142,11 @@ input {
     font-size: 2.5rem;
     margin: auto;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 1), 1px 1px 8px rgba(0, 0, 0, 0.5);
+    padding-bottom: 0.5em;
+}
+#currentPlayer div{
+    padding-left: 0.5em;
+    padding-top: 0.5em;
 }
 #players{
     font-size: 1.5rem;
@@ -215,7 +220,6 @@ input {
     max-width: 50%;
 
     backdrop-filter: blur(8px);
-    padding: 1em;
     background-color: rgba(175, 175, 175, 0.25);
     border-top: solid 1px rgba(175, 175, 175, 0.6);
     border-right: solid 1px rgba(175, 175, 175, 0.8);
@@ -225,9 +229,11 @@ input {
     border-radius: 3px;
 }
 #scoreboardContainer{
+    display: flex;
+    align-items: stretch;
     width: 700px;
     margin: auto;
-    font-size: 2.5rem;
+    font-size: 1.1em;
     backdrop-filter: blur(8px);
     padding: 1em;
     background-color: rgba(175, 175, 175, 0.25);
@@ -239,6 +245,18 @@ input {
     border-radius: 3px;
     
 }
+#scoreboard{
+    width: 50%;
+}
+#scoreboardContainer div div:hover {
+    background-color: rgba(0,0,0,0.25);
+}
+
+#scoreboardDetail{
+    width: 50%;
+    align-items: center;
+    align-self: center;
+}
 #playAgainContainer {
     width: 100%;
 }
@@ -246,3 +264,51 @@ input {
     margin: 1em;
     margin-left: calc(50% - 72px);
 }
+
+
+
+/* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+    visibility: hidden; /* Hidden by default. Visible on click */
+    min-width: 250px; /* Set a default minimum width */
+    margin-left: -125px; /* Divide value of min-width by 2 */
+    background-color: coral; /* Black background color */
+    color: #fff; /* White text color */
+    text-align: center; /* Centered text */
+    border-radius: 2px; /* Rounded borders */
+    padding: 16px; /* Padding */
+    position: fixed; /* Sit on top of the screen */
+    z-index: 1; /* Add a z-index if needed */
+    left: 50%; /* Center the snackbar */
+    top: 30px; /* 30px from the bottom */
+  }
+  
+  /* Show the snackbar when clicking on a button (class added with JavaScript) */
+  #snackbar.show {
+    visibility: visible; /* Show the snackbar */
+    /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+    However, delay the fade out process for 2.5 seconds */
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 3s;
+    animation: fadein 0.5s, fadeout 0.5s 3s;
+  }
+  
+  /* Animations to fade the snackbar in and out */
+  @-webkit-keyframes fadein {
+    from {top: -30px; opacity: 0;}
+    to {top: 30px; opacity: 1;}
+  }
+  
+  @keyframes fadein {
+    from {top: -30px; opacity: 0;}
+    to {top: 30px; opacity: 1;}
+  }
+  
+  @-webkit-keyframes fadeout {
+    from {top: 30px; opacity: 1;}
+    to {top: -30px; opacity: 0;}
+  }
+  
+  @keyframes fadeout {
+    from {top: 30px; opacity: 1;}
+    to {top: -30px; opacity: 0;}
+  }

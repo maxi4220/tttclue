@@ -1,4 +1,5 @@
 let allPlayers = [];
+let scoreboardPlayers = [];
 let socket = io({transports: ['websocket'], upgrade: false});
 let ready = false;
 let gameState = 0; // Game not started
@@ -7,44 +8,48 @@ let playerClicked;
 let host = false;
 
 const startGame = document.createElement("button");
-startGame.appendChild(document.createTextNode("Start game"));
-startGame.className = "commonButton";
-startGame.id = "btnStartGame";
-startGame.onclick = function(){
-    if(validateData()){
-        updatePlayers(allPlayers);
-        ready = true;
-        if ( gameState === 1 ) {
-            blockInputs(true);        
-            const playerName = document.getElementById("playerName");
-            const truth1 = document.getElementById("truth1");
-            const truth2 = document.getElementById("truth2");
-            const lie = document.getElementById("lie");
 
-            startGame.style.display = "none";
-            socket.emit("startGame", {
-                name: playerName.value,
-                ready: true,
-                truth1: truth1.value,
-                truth2: truth2.value,
-                lie: lie.value
-            });
-        } else {
-            window.alert("All must be ready");
+function init() {
+    
+    startGame.appendChild(document.createTextNode("Start game"));
+    startGame.className = "commonButton";
+    startGame.id = "btnStartGame";
+    startGame.onclick = function(){
+        if(validateData()){
+            updatePlayers(allPlayers);
+            ready = true;
+            if ( gameState === 1 ) {
+                blockInputs(true);        
+                const playerName = document.getElementById("playerName");
+                const truth1 = document.getElementById("truth1");
+                const truth2 = document.getElementById("truth2");
+                const lie = document.getElementById("lie");
+
+                startGame.style.display = "none";
+                socket.emit("startGame", {
+                    name: playerName.value,
+                    ready: true,
+                    truth1: truth1.value,
+                    truth2: truth2.value,
+                    lie: lie.value
+                });
+            } else {
+                showAlert("All must be ready!");
+            }
         }
-    }
-};
+    };
 
 
-const playerName = document.getElementById("playerName");
-const truth1 = document.getElementById("truth1");
-const truth2 = document.getElementById("truth2");
-const lie = document.getElementById("lie");
-playerName.value = dummyPlayers[Math.floor(Math.random() * 50)].name;
-truth1.value = "I am " + dummyPlayers[Math.floor(Math.random() * 50)].age + " years old.";
-truth2.value = "My blood type is " + dummyPlayers[Math.floor(Math.random() * 50)].blood + ".";
-lie.value = "I'm " + dummyPlayers[Math.floor(Math.random() * 50)].height + " tall.";
-socket.emit("changeName", playerName.value);
+    const playerName = document.getElementById("playerName");
+    const truth1 = document.getElementById("truth1");
+    const truth2 = document.getElementById("truth2");
+    const lie = document.getElementById("lie");
+    playerName.value = dummyPlayers[Math.floor(Math.random() * 50)].name;
+    truth1.value = "I am " + dummyPlayers[Math.floor(Math.random() * 50)].age + " years old.";
+    truth2.value = "My blood type is " + dummyPlayers[Math.floor(Math.random() * 50)].blood + ".";
+    lie.value = "I'm " + dummyPlayers[Math.floor(Math.random() * 50)].height + " tall.";
+    socket.emit("changeName", playerName.value);
+}
 
 socket.on("host", function(socketId) {
     const hostGuest = document.getElementById("hostGuest");
@@ -140,11 +145,12 @@ socket.on("playerFinished", function(scoreboard, socketId){
     }
 });
 
-socket.on("gameFinished", function(){
+socket.on("gameFinished", function(players){
     gameState = 4; // game finished
     let playAgainContainer = document.getElementById("playAgainContainer");
     playAgainContainer.style.display = "";
     setNotReady();
+    scoreboardPlayers = players;
     // enable button to play again on the host
 });
 
@@ -194,6 +200,8 @@ function updatePlayers(players) {
     }
     if(players.length > 1 && readyCount === players.length - 1) {
         gameState = 1; // Game is starting
+    } else {
+        gameState = 0;
     }
 }
 
@@ -209,19 +217,19 @@ function validateData() {
     const lie = document.getElementById("lie");
 
     if( playerName.value === "" ){
-        window.alert("enter your name");
+        showAlert("Enter your name.");
         return false;
     }
     if( truth1.value === "" ){
-        window.alert("enter the truth 1 about you");
+        showAlert("Enter your first truth.");
         return false;
     }
     if( truth2.value === "" ){
-        window.alert("enter the truth 2 about you");
+        showAlert("Enter your second truth.");
         return false;
     }
     if( lie.value === "" ){
-        window.alert("enter the lie about you");
+        showAlert("Enter your lie.");
         return false;
     }
     return true;
@@ -258,6 +266,7 @@ function setNotReady() {
     if(btnNotReady)
         btnNotReady.style.display = "none";
     ready = false;
+    gameState = 0;
     socket.emit("setNotReady");
 }
 function blockInputs(val){
@@ -289,19 +298,63 @@ function showCurrentPlayer() {
     let divCurrentPlayer = document.getElementById("currentPlayer");
     divCurrentPlayer.innerHTML = "";
 
-    let liIndex = document.createElement("li");
-    liIndex.appendChild(document.createTextNode(currentPlayer.currentPlayerIndex));
+    let liIndex = document.createElement("div");
+    liIndex.appendChild(document.createTextNode(currentPlayer.currentPlayerIndex + ". "));
+    liIndex.style.backgroundColor = "rgba(175, 175, 175, 0.25)";
+    liIndex.style.padding = "0.5em";
     divCurrentPlayer.appendChild(liIndex)
 
-    let li = document.createElement("li");
-    li.appendChild(document.createTextNode(currentPlayer.truth1));
-    divCurrentPlayer.appendChild(li)
-    let li2 = document.createElement("li");
-    li2.appendChild(document.createTextNode(currentPlayer.truth2));
-    divCurrentPlayer.appendChild(li2)
-    let li3 = document.createElement("li");
-    li3.appendChild(document.createTextNode(currentPlayer.lie));
-    divCurrentPlayer.appendChild(li3)
+
+    let truthsLie = [];
+
+    truthsLie.push(currentPlayer.truth1);
+    truthsLie.push(currentPlayer.truth2);
+    truthsLie.push(currentPlayer.lie);
+
+
+    
+    let random = parseInt(Math.random()*5);
+    let indexes = [];
+    switch(random){
+        case 0:
+            indexes.push(0);
+            indexes.push(1);
+            indexes.push(2);
+            break;
+        case 1:
+            indexes.push(0);
+            indexes.push(2);
+            indexes.push(1);
+            break;
+        case 2:
+            indexes.push(1);
+            indexes.push(0);
+            indexes.push(2);
+            break;
+        case 3:
+            indexes.push(1);
+            indexes.push(2);
+            indexes.push(0);
+            break;
+        case 4:
+            indexes.push(2);
+            indexes.push(1);
+            indexes.push(0);
+            break;
+        case 5:
+            indexes.push(2);
+            indexes.push(0);
+            indexes.push(1);
+            break;
+    }
+    for(let i in indexes){
+        let div = document.createElement("div");
+        div.appendChild(document.createTextNode(truthsLie[ indexes[i] ]));
+        divCurrentPlayer.appendChild(div);
+    }
+    
+
+
     currentPlayerContainer.style.display = "block";
 }
 
@@ -344,7 +397,7 @@ function updateScoreboard(scoreboard) {
 
         let player = scoreboard[i];
 
-        let li = document.createElement("li");
+        let div = document.createElement("div");
         
         let position = document.createElement("span");
         let name = document.createElement("span");
@@ -356,16 +409,71 @@ function updateScoreboard(scoreboard) {
         points.appendChild(document.createTextNode(player.points+" pts. "));
         time.appendChild(document.createTextNode(player.time+" ms."));
 
-        li.appendChild(position);
-        li.appendChild(name);
-        li.appendChild(points);
-        li.appendChild(time);
+        div.appendChild(position);
+        div.appendChild(name);
+        div.appendChild(points);
+        div.appendChild(time);
+        div.socketId = player.socketId;
 
-        objScoreboard.appendChild(li);
+        /*div.onmouseout = function(){
+            let scoreboardDetail = document.getElementById("scoreboardDetail");
+            scoreboardDetail.innerHTML = "";
+        }*/
+        div.onmouseover = function(event){
+            if (window.event) {
+                eventObj = window.event.srcElement;
+            }
+            else {
+                eventObj = event.target;
+            }
+
+            if(eventObj.parentNode.socketId){
+                eventObj = eventObj.parentNode;
+            }
+            
+            let scoreboardDetail = document.getElementById("scoreboardDetail");
+            let socketId = eventObj.socketId;
+            let truth1 = document.createElement("div");
+            let truth2 = document.createElement("div");
+            let lie = document.createElement("div");
+            let player;
+            for(let i = 0; i < scoreboardPlayers.length; i++){
+                player = scoreboardPlayers[i];
+                if ( player.socketId === socketId ) {
+                    break;
+                }
+            }
+            
+            truth1.appendChild(document.createTextNode("Truth 1: " + player.truth1 ));
+            truth2.appendChild(document.createTextNode("Truth 2: " + player.truth2 ));
+            lie.appendChild(document.createTextNode("Lie: " + player.lie ));
+
+            scoreboardDetail.innerHTML = "";
+
+            scoreboardDetail.appendChild(truth1);
+            scoreboardDetail.appendChild(truth2);
+            scoreboardDetail.appendChild(lie);
+        };
+
+        objScoreboard.appendChild(div);
+        objScoreboard.onmouseout = function(){
+            let scoreboardDetail = document.getElementById("scoreboardDetail");
+            scoreboardDetail.innerHTML = "";
+        };
 
     }
 
 
     objScoreboardContainer.style.display = "";
 
+}
+
+function showAlert(message) {
+    var x = document.getElementById("snackbar");
+    x.innerHTML = message;
+    // Add the "show" class to DIV
+    x.className = "show";
+  
+    // After 3 seconds, remove the show class from DIV
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
 }

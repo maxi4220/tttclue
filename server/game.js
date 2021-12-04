@@ -48,7 +48,8 @@ class Game {
                     {
                         name: player.name, 
                         points: player.points, 
-                        time: player.endTime - player.startTime // milliseconds
+                        time: player.endTime - player.startTime,
+                        socketId: player.socketId
                     }
                 );
 
@@ -56,7 +57,8 @@ class Game {
                 
                 let totalAnswers = player.answers.length * ( player.answers.length + 1 );
                 if ( room.totalAnswers === totalAnswers ) {
-                    io.emit("gameFinished", "");
+                    room.gameState = 0;
+                    io.emit("gameFinished", room.players);
                 }
             }
         }

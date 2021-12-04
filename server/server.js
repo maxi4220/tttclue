@@ -31,11 +31,12 @@ io.on('connection', (socket) => {
     let room = io.of("/").adapter.rooms.get("room");
 
     if ( !room || ( room && game.rooms[0].gameState === 0 ) ) {
+        
         socket.join("room");
         socket.data.host = false;
 
         room = io.of("/").adapter.rooms.get("room");
-
+        
         if ( room.size == 1 ) {
             game.createRoom(socket.id);
             hostSocket = socket;
@@ -45,7 +46,9 @@ io.on('connection', (socket) => {
             game.addPlayerToRoom(socket.id, game.rooms[0]);
         }
         
-        io.emit("updatePlayers", game.rooms[0].players);
+        console.log(game.rooms[0].gameState);
+
+        auxUpdatePlayers(game.rooms[0].players);
         socket.on('disconnect', () => {
             Debug.clear();
             let room = io.of("/").adapter.rooms.get("room");
@@ -53,7 +56,7 @@ io.on('connection', (socket) => {
             if(room){
                 game.rooms[0].removePlayer(socket.id);
 
-                io.emit("updatePlayers", game.rooms[0].players);
+                auxUpdatePlayers(game.rooms[0].players);
                 // Choose another host if players available
                 if ( socket.data.host && room.size > 0) {
                     
@@ -84,10 +87,11 @@ io.on('connection', (socket) => {
             const player = game.getPlayerInRoom(game.rooms[0], socket.id);
             if(player){
                 player.name = name;
-                io.emit("updatePlayers", game.rooms[0].players);
+                auxUpdatePlayers(game.rooms[0].players);
             }
         });
         socket.on("startGame", (data)=>{
+            game.rooms[0].gameState = 1;
             const player = game.getPlayerInRoom(game.rooms[0], socket.id);
             player.name = data.name;
             player.image = data.image;
@@ -109,19 +113,27 @@ io.on('connection', (socket) => {
             game.startGame(io, game.rooms[0]);
         });
         socket.on("setReady", (data)=>{
-            const player = game.getPlayerInRoom(game.rooms[0], socket.id);
-            player.name = data.name;
-            player.image = data.image;
-            player.ready = data.ready;
-            player.truth1 = data.truth1;
-            player.truth2 = data.truth2;
-            player.lie = data.lie;
-            io.emit("updatePlayers", game.rooms[0].players);
+            game.rooms[0].players.map((p)=>{
+                if(p.socketId === socket.id){
+                    p.name = data.name;
+                    p.image = data.image;
+                    p.ready = true;
+                    p.truth1 = data.truth1;
+                    p.truth2 = data.truth2;
+                    p.lie = data.lie;
+                }
+            });
+            
+            auxUpdatePlayers(game.rooms[0].players);
         });
         socket.on("setNotReady", ()=>{
-            const player = game.getPlayerInRoom(game.rooms[0], socket.id);
-            player.ready = false;
-            io.emit("updatePlayers", game.rooms[0].players);
+            game.rooms[0].players.map((p)=>{
+                if(p.socketId === socket.id){
+                    p.ready = false;
+                }
+            });
+            
+            auxUpdatePlayers(game.rooms[0].players);
         });
         socket.on("showNextPlayer", ()=>{
             let player = game.getPlayerInRoom(game.rooms[0], socket.id);
@@ -136,6 +148,7 @@ io.on('connection', (socket) => {
 
                         nextPlayer = game.getPlayerInRoom(game.rooms[0], nextAvailable.q);
                         player.currentPlayer = nextAvailable.q;
+                        
                         socket.emit("getCurrentPlayer", {
                             truth1: nextPlayer.truth1,
                             truth2: nextPlayer.truth2,
@@ -170,4 +183,14 @@ if( Debug.enabled ) {
         }
         io.emit("debug", Debug.debugItems);
     }, 1000);
+}
+function auxUpdatePlayers(players){
+    players = players.map((player)=>{
+        return {
+            name: player.name,
+            socketId: player.socketId,
+            ready: player.ready
+        }
+    });
+    io.emit("updatePlayers", players);
 }
