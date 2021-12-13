@@ -45,8 +45,6 @@ io.on('connection', (socket) => {
         } else {
             game.addPlayerToRoom(socket.id, game.rooms[0]);
         }
-        
-        console.log(game.rooms[0].gameState);
 
         auxUpdatePlayers(game.rooms[0].players);
         socket.on('disconnect', () => {

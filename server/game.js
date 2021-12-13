@@ -93,7 +93,6 @@ class Game {
                     }
                 });
 
-            console.log(p.answers);
             const currentPlayer = this.getPlayerInRoom(room, p.answers[0].q);
             p.currentPlayer = currentPlayer.socketId;
             io.to(p.socketId).emit("getCurrentPlayer", {

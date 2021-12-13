@@ -9,6 +9,10 @@ let host = false;
 
 const startGame = document.createElement("button");
 
+const correctSounds = [new Audio('yes1.mp3'),new Audio('yes2.mp3'),new Audio('yes3.mp3'),new Audio('yes4.mp3')];
+const incorrectSounds = [new Audio('no1.mp3'),new Audio('no2.mp3'),new Audio('no3.mp3'),new Audio('no4.mp3')];
+
+
 function init() {
     
     startGame.appendChild(document.createTextNode("Start game"));
@@ -108,17 +112,18 @@ socket.on("getCurrentPlayer", function(player){
     showCurrentPlayer();
 });
 socket.on("playerCorrect", function(socketId){
-    console.log(socketId + " is correct");
+    playSound("correct");
     playerClicked.classList.add("playerCorrect");
     playerClicked.onclick = undefined;
+    let playerIncorrect = document.getElementsByClassName("selectablePlayer");
+    for(let i = 0; i < playerIncorrect.length; i++){
+        playerIncorrect[i].classList.remove("playerIncorrect");
+    }
     socket.emit("showNextPlayer");
 });
 socket.on("playerIncorrect", function(socketId){
-    console.log(socketId + " is incorrect");
-    playerClicked.className = "playerIncorrect";
-    window.setTimeout(function(){
-        playerClicked.classList.remove("playerIncorrect");
-    },1000);
+    playSound("incorrect");
+    playerClicked.classList.add("playerIncorrect");
 });
 
 socket.on("playerFinished", function(scoreboard, socketId){
@@ -151,6 +156,8 @@ socket.on("gameFinished", function(players){
     playAgainContainer.style.display = "";
     setNotReady();
     scoreboardPlayers = players;
+    let objScoreboardHint = document.getElementById("scoreboardHint");
+    objScoreboardHint.style.display = "";
     // enable button to play again on the host
 });
 
@@ -176,6 +183,7 @@ function updatePlayers(players) {
         
         if( player.socketId !== socket.id ){
             let li2 = document.createElement("div");
+            li2.classList.add("selectablePlayer");
             li2.appendChild(document.createTextNode(player.name));
             li2.socketId = player.socketId;
 
@@ -284,9 +292,11 @@ function updateScreenGameStarted() {
     let eligiblePlayers = document.getElementById("eligiblePlayers");
     let players = document.getElementById("players");
     let btnShowNextPlayer = document.getElementById("btnShowNextPlayer");
+    let titleAndRules = document.getElementById("titleAndRules");
     
 
     players.style.display="none";
+    titleAndRules.style.display="none";    
     eligiblePlayers.style.display="";
     btnShowNextPlayer.style.display="";
 
@@ -362,18 +372,23 @@ function restart(){
     let btnReady = document.getElementById("btnReady");
     let btnStartGame = document.getElementById("btnStartGame");
     let objScoreboardContainer = document.getElementById("scoreboardContainer");
+    let objScoreboardHint = document.getElementById("scoreboardHint");
     let idInputContainer = document.getElementById("idInputContainer");
     let playAgainContainer = document.getElementById("playAgainContainer");
+    let titleAndRules = document.getElementById("titleAndRules");
     
     
 
     let ulPlayers = document.getElementById("players");
     ulPlayers.style.display = "";
-
+    
+    
+    objScoreboardHint.style.display = "none";
     objScoreboardContainer.style.display = "none";
     playAgainContainer.style.display = "none";
     
     idInputContainer.style.display = "";
+    titleAndRules.style.display = "";
     
 
     if(btnReady)
@@ -390,6 +405,7 @@ function showNextPlayer(){
 
 function updateScoreboard(scoreboard) {
     let objScoreboardContainer = document.getElementById("scoreboardContainer");
+    
     let objScoreboard = document.getElementById("scoreboard");
     objScoreboard.innerHTML = "";
     
@@ -413,13 +429,22 @@ function updateScoreboard(scoreboard) {
         div.appendChild(name);
         div.appendChild(points);
         div.appendChild(time);
+        if( i === 0 )
+            div.classList.add("firstPlace");
+        div.classList.add("scoreboardItem");
         div.socketId = player.socketId;
 
         /*div.onmouseout = function(){
             let scoreboardDetail = document.getElementById("scoreboardDetail");
             scoreboardDetail.innerHTML = "";
         }*/
-        div.onmouseover = function(event){
+        div.onclick = function(event){
+            let objScoreboard = document.getElementById("scoreboard");
+            
+            for(let i = 0; i < objScoreboard.childNodes.length; i++){
+                objScoreboard.childNodes[i].style.backgroundColor = "";
+            }
+
             if (window.event) {
                 eventObj = window.event.srcElement;
             }
@@ -453,14 +478,10 @@ function updateScoreboard(scoreboard) {
             scoreboardDetail.appendChild(truth1);
             scoreboardDetail.appendChild(truth2);
             scoreboardDetail.appendChild(lie);
+            eventObj.style.backgroundColor = "rgba(255,255,255,0.35)";
         };
 
         objScoreboard.appendChild(div);
-        objScoreboard.onmouseout = function(){
-            let scoreboardDetail = document.getElementById("scoreboardDetail");
-            scoreboardDetail.innerHTML = "";
-        };
-
     }
 
 
@@ -476,4 +497,20 @@ function showAlert(message) {
   
     // After 3 seconds, remove the show class from DIV
     setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+
+function playSound(yesNo){
+    let sound;
+    if(yesNo === "correct"){
+        sound = getRandomSound(correctSounds);
+    } else {
+        sound = getRandomSound(incorrectSounds);
+    }
+    sound.volume = 0.5;
+    sound.play();
+}
+
+function getRandomSound(sounds) {
+    let random = Math.floor(Math.random() * 4);
+    return sounds[random];
 }

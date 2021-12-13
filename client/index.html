@@ -9,10 +9,16 @@
     <script type="text/javascript" src="data.js"></script>
 </head>
 <body onload="init()">
+
     <div id="playAgainContainer" style="display: none">
         <button id="btnPlayAgain" class="commonButton" onclick="restart()">Play Again</button>
     </div>
+    <div id="titleAndRules">
+        <h1>Two Truths & A Lie</h1>
+        <p>Connect with your colleagues to learn more about them. Each one must enter two truths and a lie about them and you must choose who you think they correspond to. Use the "SKIP" button if you are not sure who to choose, since making a mistake subtracts points. Be the most accurate and do it before the others to get the first place.</p>
+    </div>
     <div id="idInputContainer" class="inputContainer">
+
         <input maxlength="20" type="text" placeholder="Enter your name" id="playerName" onkeyup="sendName(event)" autocomplete="chrome-off" autocomplete="off" /><br/>
         <input type="text" placeholder="Truth 1" id="truth1" autocomplete="chrome-off" autocomplete="off" /><br/>
         <input type="text" placeholder="Truth 2" id="truth2" autocomplete="chrome-off" autocomplete="off" /><br/>
@@ -41,6 +47,9 @@
     <div style="display:none;width:300px; position:fixed; right: 0; top: 0; background-color: lightgrey;" 
          id="debug"></div>
 
+    <div style="display:none;" id="scoreboardHint">
+        Click on the players to see their details.
+    </div>
     <div style="display:none;" id="scoreboardContainer">
         <div id="scoreboard"></div>
         <div id="scoreboardDetail"></div>
