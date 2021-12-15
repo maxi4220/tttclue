@@ -53,8 +53,9 @@ io.on('connection', (socket) => {
             
             if(room){
                 game.rooms[0].removePlayer(socket.id);
+                game.rooms[0].clean();
 
-                auxUpdatePlayers(game.rooms[0].players);
+                restartGame(game.rooms[0].players);
                 // Choose another host if players available
                 if ( socket.data.host && room.size > 0) {
                     
@@ -192,3 +193,7 @@ function auxUpdatePlayers(players){
     });
     io.emit("updatePlayers", players);
 }
+function restartGame(players){
+    io.emit("restartGame", players);
+}
+

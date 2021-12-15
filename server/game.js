@@ -125,6 +125,7 @@ class Room {
         this.players.splice(this.players.indexOf(this.players.find(a=>a.socketId === socketId)), 1);
     }
     clean(){
+        this.gameState = 0;
         this.totalAnswers = 0;
         this.scoreboard = [];
         this.players.forEach(player => {

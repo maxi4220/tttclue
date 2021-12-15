@@ -43,8 +43,7 @@ function init() {
         }
     };
 
-
-    const playerName = document.getElementById("playerName");
+/*   const playerName = document.getElementById("playerName");
     const truth1 = document.getElementById("truth1");
     const truth2 = document.getElementById("truth2");
     const lie = document.getElementById("lie");
@@ -53,6 +52,7 @@ function init() {
     truth2.value = "My blood type is " + dummyPlayers[Math.floor(Math.random() * 50)].blood + ".";
     lie.value = "I'm " + dummyPlayers[Math.floor(Math.random() * 50)].height + " tall.";
     socket.emit("changeName", playerName.value);
+  */  
 }
 
 socket.on("host", function(socketId) {
@@ -61,6 +61,7 @@ socket.on("host", function(socketId) {
     hostGuest.appendChild(startGame);
     document.getElementById("socketId").innerHTML = socketId;    
     host = true;
+    showAlert("You now can start the game.");
 });
 
 socket.on("debug", function(data) {
@@ -134,8 +135,6 @@ socket.on("playerFinished", function(scoreboard, socketId){
     
     if ( gameState === 3 ) {
         
-        console.log("You answered all.");
-
         let btnShowNextPlayer = document.getElementById("btnShowNextPlayer");
         btnShowNextPlayer.style.display = "none";
 
@@ -159,6 +158,12 @@ socket.on("gameFinished", function(players){
     let objScoreboardHint = document.getElementById("scoreboardHint");
     objScoreboardHint.style.display = "";
     // enable button to play again on the host
+});
+
+socket.on("restartGame", function(players){
+    showAlert("A player disconnected or refreshed the page.");
+    restart();
+    updatePlayers(players);
 });
 
 function updatePlayers(players) {
@@ -195,9 +200,10 @@ function updatePlayers(players) {
                 else {
                     eventObj = event.target;
                 }
-                socket.emit("choosePlayer", eventObj.socketId);
-                console.log(eventObj.socketId);
-                playerClicked = eventObj;
+                if( !eventObj.classList.contains("playerIncorrect") ){
+                    socket.emit("choosePlayer", eventObj.socketId);
+                    playerClicked = eventObj;
+                }
             };
             ulEligiblePlayers.appendChild(li2);
         }
@@ -370,22 +376,32 @@ function showCurrentPlayer() {
 
 function restart(){
     let btnReady = document.getElementById("btnReady");
+    let btnNotReady = document.getElementById("btnNotReady");
     let btnStartGame = document.getElementById("btnStartGame");
     let objScoreboardContainer = document.getElementById("scoreboardContainer");
     let objScoreboardHint = document.getElementById("scoreboardHint");
     let idInputContainer = document.getElementById("idInputContainer");
     let playAgainContainer = document.getElementById("playAgainContainer");
     let titleAndRules = document.getElementById("titleAndRules");
+    let btnShowNextPlayer = document.getElementById("btnShowNextPlayer");
+    let currentPlayerContainer = document.getElementById("currentPlayerContainer");
+    let eligiblePlayers = document.getElementById("eligiblePlayers");
+    let scoreboardDetail = document.getElementById("scoreboardDetail");
     
-    
+    scoreboardDetail.innerHTML = "";
 
     let ulPlayers = document.getElementById("players");
     ulPlayers.style.display = "";
     
-    
     objScoreboardHint.style.display = "none";
     objScoreboardContainer.style.display = "none";
     playAgainContainer.style.display = "none";
+    btnShowNextPlayer.style.display = "none";
+    currentPlayerContainer.style.display = "none";
+    eligiblePlayers.style.display = "none";
+    if(btnNotReady)
+        btnNotReady.style.display = "none";
+    
     
     idInputContainer.style.display = "";
     titleAndRules.style.display = "";
@@ -400,6 +416,10 @@ function restart(){
 }
 
 function showNextPlayer(){
+    let playerIncorrect = document.getElementsByClassName("selectablePlayer");
+    for(let i = 0; i < playerIncorrect.length; i++){
+        playerIncorrect[i].classList.remove("playerIncorrect");
+    }
     socket.emit("showNextPlayer");
 }
 
@@ -439,46 +459,48 @@ function updateScoreboard(scoreboard) {
             scoreboardDetail.innerHTML = "";
         }*/
         div.onclick = function(event){
-            let objScoreboard = document.getElementById("scoreboard");
-            
-            for(let i = 0; i < objScoreboard.childNodes.length; i++){
-                objScoreboard.childNodes[i].style.backgroundColor = "";
-            }
-
-            if (window.event) {
-                eventObj = window.event.srcElement;
-            }
-            else {
-                eventObj = event.target;
-            }
-
-            if(eventObj.parentNode.socketId){
-                eventObj = eventObj.parentNode;
-            }
-            
-            let scoreboardDetail = document.getElementById("scoreboardDetail");
-            let socketId = eventObj.socketId;
-            let truth1 = document.createElement("div");
-            let truth2 = document.createElement("div");
-            let lie = document.createElement("div");
-            let player;
-            for(let i = 0; i < scoreboardPlayers.length; i++){
-                player = scoreboardPlayers[i];
-                if ( player.socketId === socketId ) {
-                    break;
+            if( gameState === 0 ){
+                let objScoreboard = document.getElementById("scoreboard");
+                
+                for(let i = 0; i < objScoreboard.childNodes.length; i++){
+                    objScoreboard.childNodes[i].style.backgroundColor = "";
                 }
+
+                if (window.event) {
+                    eventObj = window.event.srcElement;
+                }
+                else {
+                    eventObj = event.target;
+                }
+
+                if(eventObj.parentNode.socketId){
+                    eventObj = eventObj.parentNode;
+                }
+                
+                let scoreboardDetail = document.getElementById("scoreboardDetail");
+                let socketId = eventObj.socketId;
+                let truth1 = document.createElement("div");
+                let truth2 = document.createElement("div");
+                let lie = document.createElement("div");
+                let player;
+                for(let i = 0; i < scoreboardPlayers.length; i++){
+                    player = scoreboardPlayers[i];
+                    if ( player.socketId === socketId ) {
+                        break;
+                    }
+                }
+                
+                truth1.appendChild(document.createTextNode("Truth 1: " + player.truth1 ));
+                truth2.appendChild(document.createTextNode("Truth 2: " + player.truth2 ));
+                lie.appendChild(document.createTextNode("Lie: " + player.lie ));
+
+                scoreboardDetail.innerHTML = "";
+
+                scoreboardDetail.appendChild(truth1);
+                scoreboardDetail.appendChild(truth2);
+                scoreboardDetail.appendChild(lie);
+                eventObj.style.backgroundColor = "rgba(255,255,255,0.35)";
             }
-            
-            truth1.appendChild(document.createTextNode("Truth 1: " + player.truth1 ));
-            truth2.appendChild(document.createTextNode("Truth 2: " + player.truth2 ));
-            lie.appendChild(document.createTextNode("Lie: " + player.lie ));
-
-            scoreboardDetail.innerHTML = "";
-
-            scoreboardDetail.appendChild(truth1);
-            scoreboardDetail.appendChild(truth2);
-            scoreboardDetail.appendChild(lie);
-            eventObj.style.backgroundColor = "rgba(255,255,255,0.35)";
         };
 
         objScoreboard.appendChild(div);
