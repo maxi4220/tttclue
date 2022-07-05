@@ -9,8 +9,8 @@ let host = false;
 
 const startGame = document.createElement("button");
 
-const correctSounds = [new Audio('yes1.mp3'),new Audio('yes2.mp3'),new Audio('yes3.mp3'),new Audio('yes4.mp3')];
-const incorrectSounds = [new Audio('no1.mp3'),new Audio('no2.mp3'),new Audio('no3.mp3'),new Audio('no4.mp3')];
+const correctSounds = [new Audio('assets/yes1.mp3'),new Audio('assets/yes2.mp3'),new Audio('assets/yes3.mp3'),new Audio('assets/yes4.mp3')];
+const incorrectSounds = [new Audio('assets/no1.mp3'),new Audio('assets/no2.mp3'),new Audio('assets/no3.mp3'),new Audio('assets/no4.mp3')];
 
 
 function init() {

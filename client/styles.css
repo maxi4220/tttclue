@@ -1,13 +1,13 @@
 @font-face {
     font-family: 'ThunderBlack';
-    src: url('Thunder-BlackLC.woff') format('woff');
+    src: url('assets/Thunder-BlackLC.woff') format('woff');
     font-style: normal;
     font-weight: normal;
     text-rendering: optimizeLegibility;
 }
 @font-face {
     font-family: 'Thunder';
-    src: url('Thunder-LC.woff') format('woff');
+    src: url('assets/Thunder-LC.woff') format('woff');
     font-style: normal;
     font-weight: normal;
     text-rendering: optimizeLegibility;
@@ -67,7 +67,7 @@ html, body{
 }
 body {
     background-color: black;
-    background-image: url('bg.jpg');
+    background-image: url('assets/bg.jpg');
     background-repeat: no-repeat;
     background-position: center auto;
     background-size: cover;
