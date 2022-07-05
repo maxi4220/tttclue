@@ -200,10 +200,11 @@ function updatePlayers(players) {
                 else {
                     eventObj = event.target;
                 }
-                if( !eventObj.classList.contains("playerIncorrect") ){
+                if( !eventObj.classList.contains("playerIncorrect") && !eventObj.classList.contains("playerCorrect")){
                     socket.emit("choosePlayer", eventObj.socketId);
                     playerClicked = eventObj;
                 }
+                
             };
             ulEligiblePlayers.appendChild(li2);
         }
